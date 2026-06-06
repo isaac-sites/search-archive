@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AFU Search CORS Test</title>
+  <style>
+    body {
+      margin: 0;
+      background: #fbfaf6;
+      color: #172328;
+      font: 16px/1.5 Georgia, "Times New Roman", serif;
+      padding: 2rem;
+    }
+
+    main {
+      margin: 0 auto;
+      max-width: 900px;
+    }
+
+    button {
+      background: #155e63;
+      border: 0;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      padding: .65rem 1rem;
+    }
+
+    pre {
+      background: #0f172a;
+      border-radius: 10px;
+      color: #e2e8f0;
+      min-height: 14rem;
+      overflow: auto;
+      padding: 1rem;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>AFU Search CORS Test</h1>
+    <p>
+      This page checks whether JavaScript running on <code>search-archive.isaackoi.com</code>
+      can read the public AFU-hosted JSON and gzip search files.
+    </p>
+    <button id="run">Run CORS Test</button>
+    <pre id="out">Ready.</pre>
+  </main>
+  <script>
+    const output = document.getElementById("out");
+    const checks = [
+      ["collection.json", "https://files.afu.se/Downloads/search/collections/magazines/united-states/collection.json", "json"],
+      ["issues.json", "https://files.afu.se/Downloads/search/collections/magazines/united-states/issues.json", "json"],
+      ["APRO index.json.gz", "https://files.afu.se/Downloads/search/collections/magazines/united-states/apro-bulletin/index.json.gz", "gzip"]
+    ];
+
+    function write(line) {
+      output.textContent += line + "\n";
+    }
+
+    async function readGzipJson(url) {
+      const response = await fetch(url, {mode: "cors"});
+      if (!response.ok) throw new Error("HTTP " + response.status);
+      if (!("DecompressionStream" in window)) throw new Error("No DecompressionStream support.");
+      const stream = response.body.pipeThrough(new DecompressionStream("gzip"));
+      return JSON.parse(await new Response(stream).text());
+    }
+
+    async function run() {
+      output.textContent = "";
+      write("Origin: " + window.location.origin);
+      for (const [label, url, type] of checks) {
+        try {
+          if (type === "gzip") {
+            const data = await readGzipJson(url);
+            write("OK  " + label + " terms=" + Object.keys(data.postings || {}).length);
+          } else {
+            const response = await fetch(url, {mode: "cors"});
+            if (!response.ok) throw new Error("HTTP " + response.status);
+            const data = await response.json();
+            write("OK  " + label + (Array.isArray(data) ? " records=" + data.length : " issues=" + data.issue_count));
+          }
+        } catch (error) {
+          write("BAD " + label + " - " + error.message);
+        }
+      }
+    }
+
+    document.getElementById("run").addEventListener("click", run);
+  </script>
+</body>
+</html>
