@@ -1,39 +1,126 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AFU Search CORS Test</title>
+  <title>CORS Diagnostic | Isaac Koi Archive Search</title>
+  <script>
+    (function () {
+      var stored = null;
+      try { stored = window.localStorage.getItem("phoenix-color-mode"); } catch (error) {}
+      var theme = stored === "dark" || stored === "light"
+        ? stored
+        : (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    }());
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      color-scheme: light;
+      --page-bg: #eef3ea;
+      --surface: #fffdf8;
+      --surface-alt: #f7f7f0;
+      --text: #213124;
+      --muted: #5b665a;
+      --heading: #18231a;
+      --brand: #2e7d32;
+      --brand-dark: #1f5a24;
+      --accent: #6b4638;
+      --border: #d7dfd2;
+      --card-border: rgba(24, 35, 26, .12);
+      --shadow: 0 14px 40px rgba(23, 32, 56, .08);
+      --code-bg: #0f172a;
+      --code-text: #e2e8f0;
+    }
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --page-bg: #101725;
+      --surface: #111a2b;
+      --surface-alt: #0f1a2e;
+      --text: #d9e4f2;
+      --muted: #abc0d7;
+      --heading: #eef5ff;
+      --brand: #7ed2df;
+      --brand-dark: #bde7f0;
+      --accent: #ffbe86;
+      --border: #2c3a52;
+      --card-border: rgba(126, 210, 223, .22);
+      --shadow: 0 18px 40px rgba(0, 0, 0, .45);
+      --code-bg: #050b16;
+      --code-text: #d9e4f2;
+    }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: #fbfaf6;
-      color: #172328;
-      font: 16px/1.5 Georgia, "Times New Roman", serif;
-      padding: 2rem;
+      background: radial-gradient(circle at 12% 2%, color-mix(in srgb, var(--brand) 18%, transparent) 0%, transparent 38%), var(--page-bg);
+      color: var(--text);
+      font: 1rem/1.65 Merriweather, Georgia, serif;
     }
-
     main {
+      width: min(920px, 94vw);
       margin: 0 auto;
-      max-width: 900px;
+      padding: 2rem 0 3rem;
     }
-
-    button {
-      background: #155e63;
-      border: 0;
-      border-radius: 4px;
-      color: white;
+    a { color: var(--brand-dark); font-weight: 700; }
+    .eyebrow {
+      margin: 0 0 .22rem;
+      color: var(--accent);
+      font: 800 .68rem/1.2 Manrope, Arial, sans-serif;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: .3rem 0 .55rem;
+      color: var(--heading);
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1.12;
+    }
+    .intro { margin-bottom: 1.2rem; }
+    .intro p { margin: 0; color: var(--muted); }
+    .panel {
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      padding: 1rem;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .7rem;
+      margin-bottom: 1rem;
+    }
+    button,
+    .button-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.5rem;
+      padding: .55rem .85rem;
+      border: 1px solid var(--brand);
+      border-radius: 999px;
+      background: var(--brand);
+      color: #fff;
       cursor: pointer;
-      font-weight: bold;
-      padding: .65rem 1rem;
+      font: 700 .78rem Manrope, Arial, sans-serif;
+      text-decoration: none;
     }
-
+    :root[data-theme="dark"] button,
+    :root[data-theme="dark"] .button-link { color: #0b1220; }
+    .button-link.secondary {
+      border-color: var(--border);
+      background: var(--surface-alt);
+      color: var(--brand-dark);
+    }
     pre {
-      background: #0f172a;
-      border-radius: 10px;
-      color: #e2e8f0;
-      min-height: 14rem;
+      min-height: 16rem;
+      margin: 0;
       overflow: auto;
+      border-radius: 12px;
+      background: var(--code-bg);
+      color: var(--code-text);
       padding: 1rem;
       white-space: pre-wrap;
     }
@@ -41,19 +128,30 @@
 </head>
 <body>
   <main>
-    <h1>AFU Search CORS Test</h1>
-    <p>
-      This page checks whether JavaScript running on <code>search-archive.isaackoi.com</code>
-      can read the public AFU-hosted JSON and gzip search files.
-    </p>
-    <button id="run">Run CORS Test</button>
-    <pre id="out">Ready.</pre>
+    <section class="intro">
+      <p class="eyebrow">Diagnostic</p>
+      <h1>AFU Search CORS Test</h1>
+      <p>
+        This page checks whether JavaScript running from this GitHub Pages origin can read
+        AFU-hosted public JSON and compressed search files directly.
+      </p>
+    </section>
+
+    <section class="panel" aria-label="CORS diagnostic results">
+      <div class="actions">
+        <button id="run" type="button">Run CORS Test</button>
+        <a class="button-link secondary" href="../">Back to search shell</a>
+      </div>
+      <pre id="out">Ready.</pre>
+    </section>
   </main>
+
   <script>
     const output = document.getElementById("out");
     const checks = [
-      ["collection.json", "https://files.afu.se/Downloads/search/collections/magazines/united-states/collection.json", "json"],
-      ["issues.json", "https://files.afu.se/Downloads/search/collections/magazines/united-states/issues.json", "json"],
+      ["collections.json", "https://files.afu.se/Downloads/search/collections.json", "json"],
+      ["United States collection.json", "https://files.afu.se/Downloads/search/collections/magazines/united-states/collection.json", "json"],
+      ["United States issues.json", "https://files.afu.se/Downloads/search/collections/magazines/united-states/issues.json", "json"],
       ["APRO index.json.gz", "https://files.afu.se/Downloads/search/collections/magazines/united-states/apro-bulletin/index.json.gz", "gzip"]
     ];
 
@@ -72,6 +170,8 @@
     async function run() {
       output.textContent = "";
       write("Origin: " + window.location.origin);
+      write("Target: https://files.afu.se/Downloads/search/");
+      write("");
       for (const [label, url, type] of checks) {
         try {
           if (type === "gzip") {
@@ -81,12 +181,14 @@
             const response = await fetch(url, {mode: "cors"});
             if (!response.ok) throw new Error("HTTP " + response.status);
             const data = await response.json();
-            write("OK  " + label + (Array.isArray(data) ? " records=" + data.length : " issues=" + data.issue_count));
+            write("OK  " + label + (Array.isArray(data) ? " records=" + data.length : " issues=" + (data.issue_count || "n/a")));
           }
         } catch (error) {
           write("BAD " + label + " - " + error.message);
         }
       }
+      write("");
+      write("Expected until AFU CORS is enabled: BAD / Failed to fetch.");
     }
 
     document.getElementById("run").addEventListener("click", run);

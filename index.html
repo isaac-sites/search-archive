@@ -1,100 +1,319 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Isaac Koi Archive Search</title>
+  <meta name="description" content="Isaac Koi Archive Search shell for the public online archive search hosted at files.afu.se.">
+  <title>Archive Search | Isaac Koi</title>
+  <script>
+    (function () {
+      var stored = null;
+      try { stored = window.localStorage.getItem("phoenix-color-mode"); } catch (error) {}
+      var theme = stored === "dark" || stored === "light"
+        ? stored
+        : (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    }());
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root {
       color-scheme: light;
-      --ink: #172328;
-      --muted: #59686c;
-      --paper: #fbfaf6;
-      --panel: #ffffff;
-      --line: #d9d4c9;
-      --accent: #155e63;
+      --page-bg: #eef3ea;
+      --surface: #fffdf8;
+      --surface-alt: #f7f7f0;
+      --text: #213124;
+      --muted: #5b665a;
+      --heading: #18231a;
+      --brand: #2e7d32;
+      --brand-dark: #1f5a24;
+      --accent: #6b4638;
+      --border: #d7dfd2;
+      --card-border: rgba(24, 35, 26, .12);
+      --header-bg: rgba(251, 252, 247, .92);
+      --header-border: rgba(46, 125, 50, .16);
+      --shadow: 0 14px 40px rgba(23, 32, 56, .08);
+    }
+
+    :root[data-theme="dark"] {
+      color-scheme: dark;
+      --page-bg: #101725;
+      --surface: #111a2b;
+      --surface-alt: #0f1a2e;
+      --text: #d9e4f2;
+      --muted: #abc0d7;
+      --heading: #eef5ff;
+      --brand: #7ed2df;
+      --brand-dark: #bde7f0;
+      --accent: #ffbe86;
+      --border: #2c3a52;
+      --card-border: rgba(126, 210, 223, .22);
+      --header-bg: rgba(11, 18, 31, .9);
+      --header-border: rgba(126, 210, 223, .24);
+      --shadow: 0 18px 40px rgba(0, 0, 0, .45);
     }
 
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      background: var(--paper);
-      color: var(--ink);
-      font: 16px/1.5 Georgia, "Times New Roman", serif;
+      background: radial-gradient(circle at 12% 2%, color-mix(in srgb, var(--brand) 18%, transparent) 0%, transparent 38%), var(--page-bg);
+      color: var(--text);
+      font: 1rem/1.65 Merriweather, Georgia, serif;
+    }
+    button { font: inherit; cursor: pointer; }
+    a { color: var(--brand-dark); font-weight: 700; }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid var(--header-border);
+      background: var(--header-bg);
+      backdrop-filter: blur(8px);
     }
 
-    header {
-      background: #12363b;
-      color: #faf7ef;
-      padding: 2.4rem max(calc((100% - 1240px) / 2), 1rem) 2rem;
+    .header-inner,
+    main {
+      width: min(1320px, 94vw);
+      margin: 0 auto;
     }
 
-    header p {
-      color: #dbe2df;
-      max-width: 58rem;
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: .75rem 0;
     }
 
-    .kicker {
-      color: #c6d5cf;
-      font: .75rem Arial, sans-serif;
+    .brand-lockup {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: .7rem;
+      color: var(--brand-dark);
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      width: 2.8rem;
+      height: 2.8rem;
+      color: var(--brand);
+    }
+
+    .brand-mark svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .brand-copy { display: grid; gap: .02rem; }
+    .brand-name,
+    .eyebrow {
+      color: var(--accent);
+      font: 800 .68rem/1.2 Manrope, Arial, sans-serif;
       letter-spacing: .15em;
-      margin: 0;
       text-transform: uppercase;
     }
-
-    h1 {
-      font-size: clamp(2rem, 5vw, 3.2rem);
-      line-height: 1;
-      margin: .3rem 0 .8rem;
+    .site-title {
+      color: var(--brand-dark);
+      font: 700 1.15rem/1.25 Merriweather, Georgia, serif;
+    }
+    .site-tagline,
+    .host-note {
+      color: var(--muted);
+      font: 500 .76rem/1.35 Manrope, Arial, sans-serif;
     }
 
-    main {
-      margin: 0 auto;
-      max-width: 1240px;
-      padding: 1rem;
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+    }
+
+    .host-note {
+      max-width: 17rem;
+      text-align: right;
+    }
+
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.55rem;
+      height: 2.55rem;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background: var(--surface-alt);
+      color: var(--brand-dark);
+    }
+
+    .theme-toggle .icon {
+      width: 1rem;
+      height: 1rem;
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 1.9;
+    }
+
+    .icon-moon,
+    :root[data-theme="dark"] .icon-sun { display: none; }
+    :root[data-theme="dark"] .icon-moon { display: block; }
+
+    main { padding: 2rem 0 3rem; }
+    .intro { max-width: 58rem; margin-bottom: 1.2rem; }
+    .eyebrow { margin: 0 0 .22rem; }
+    h1 {
+      margin: .3rem 0 .55rem;
+      color: var(--heading);
+      font-size: clamp(1.8rem, 4vw, 3.1rem);
+      line-height: 1.12;
+      text-wrap: balance;
+    }
+    .intro p:last-child {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .note,
+    .search-frame-shell {
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
     }
 
     .note {
-      background: var(--panel);
-      border: 1px solid var(--line);
-      border-radius: 10px;
+      display: grid;
+      gap: .45rem;
       margin-bottom: 1rem;
-      padding: .9rem 1rem;
+      padding: 1rem 1.1rem;
+      color: var(--muted);
+      font: 500 .86rem/1.5 Manrope, Arial, sans-serif;
     }
 
-    a { color: var(--accent); }
+    .note p { margin: 0; }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .7rem;
+      margin-top: .25rem;
+    }
+    .button-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 2.5rem;
+      padding: .55rem .85rem;
+      border: 1px solid var(--brand);
+      border-radius: 999px;
+      background: var(--brand);
+      color: #fff;
+      font: 700 .78rem Manrope, Arial, sans-serif;
+      text-decoration: none;
+    }
+    :root[data-theme="dark"] .button-link { color: #0b1220; }
+    .button-link.secondary {
+      border-color: var(--border);
+      background: var(--surface-alt);
+      color: var(--brand-dark);
+    }
+
+    .search-frame-shell {
+      overflow: hidden;
+    }
 
     iframe {
-      background: white;
-      border: 1px solid var(--line);
-      border-radius: 10px;
-      box-shadow: 0 18px 40px rgba(15, 23, 42, .16);
       display: block;
-      min-height: 78vh;
       width: 100%;
+      min-height: 80vh;
+      border: 0;
+      background: var(--surface);
+    }
+
+    @media (max-width: 760px) {
+      .site-tagline,
+      .host-note { display: none; }
+      .header-inner { align-items: flex-start; }
+      main { padding-top: 1.3rem; }
+      .note,
+      .search-frame-shell { border-radius: 11px; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <p class="kicker">Isaac Koi Archive</p>
-    <h1>Magazine Search</h1>
-    <p>
-      Search the United States magazine PDFs in the AFU online archive. The files are hosted by
-      Archives for the Unexplained; this search interface and index were prepared by Isaac Koi.
-    </p>
-  </header>
-  <main>
-    <div class="note">
-      This page currently embeds the AFU-hosted search interface while direct cross-origin access
-      to the AFU search index is being tested.
-      <a href="/cors-test/">Run the CORS diagnostic</a>.
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand-lockup" href="https://isaackoi.com/" aria-label="Isaac Koi Archive home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="currentColor" stroke-width="4" stroke-linecap="square" stroke-linejoin="miter">
+              <path d="M64 20V34M64 34L44 50M64 34L84 50M44 50L28 66M44 50L52 66M84 50L76 66M84 50L100 66"/>
+            </g>
+            <rect x="60" y="66" width="8" height="24" fill="var(--accent)"/>
+            <path d="M64 90C50.8 82.8 27.9 82.8 15 90V105C29.4 98.6 50.3 98.6 64 105C77.7 98.6 98.6 98.6 113 105V90C100.1 82.8 77.2 82.8 64 90Z" fill="var(--accent)"/>
+            <path d="M64 10L74 20L64 30L54 20L64 10ZM44 42L52 50L44 58L36 50L44 42ZM84 42L92 50L84 58L76 50L84 42Z" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="brand-copy">
+          <span class="brand-name">Isaac Koi Archive</span>
+          <span class="site-title">Archive Search</span>
+          <span class="site-tagline">Research material collected and indexed by Isaac Koi</span>
+        </span>
+      </a>
+      <div class="header-actions">
+        <span class="host-note">Search data and PDFs currently served from files.afu.se</span>
+        <button class="theme-toggle" type="button" data-theme-toggle aria-label="Switch colour theme" title="Switch colour theme">
+          <svg class="icon icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg>
+          <svg class="icon icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 3a8.8 8.8 0 1 0 6.5 14.7 9.2 9.2 0 0 1-6.5-14.7z"/></svg>
+        </button>
+      </div>
     </div>
-    <iframe
-      title="AFU magazine search interface"
-      src="https://files.afu.se/Downloads/search/index.html"
-      loading="eager"
-    ></iframe>
+  </header>
+
+  <main>
+    <section class="intro">
+      <p class="eyebrow">Search the online archive</p>
+      <h1>Find material across the Isaac Koi archive</h1>
+      <p>
+        This GitHub Pages shell provides the Isaac Koi-branded entry point for the public
+        archive search. Until AFU CORS headers are enabled, the working search interface is
+        embedded from the AFU-hosted static package.
+      </p>
+    </section>
+
+    <section class="note" aria-label="Hosting note">
+      <p>
+        The archive and search index are Isaac Koi's; the online files are hosted by Archives
+        for the Unexplained. The embedded search below is served from
+        <code>files.afu.se</code>, so it can read the AFU-hosted index files without cross-origin
+        browser restrictions.
+      </p>
+      <div class="actions">
+        <a class="button-link" href="https://files.afu.se/Downloads/search/index.html">Open AFU-hosted search directly</a>
+        <a class="button-link secondary" href="cors-test/">Run CORS diagnostic</a>
+      </div>
+    </section>
+
+    <section class="search-frame-shell" aria-label="Embedded archive search">
+      <iframe
+        title="Isaac Koi archive search interface"
+        src="https://files.afu.se/Downloads/search/index.html"
+        loading="eager"
+      ></iframe>
+    </section>
   </main>
+
+  <script>
+    document.querySelector("[data-theme-toggle]").addEventListener("click", function () {
+      var root = document.documentElement;
+      var next = root.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      root.setAttribute("data-theme", next);
+      try { window.localStorage.setItem("phoenix-color-mode", next); } catch (error) {}
+    });
+  </script>
 </body>
 </html>
