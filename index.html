@@ -237,6 +237,31 @@
       overflow: hidden;
     }
 
+    .about {
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      margin-top: 1rem;
+      padding: 1.4rem 1.6rem;
+    }
+
+    .about h2 {
+      margin: 0 0 .5rem;
+      color: var(--heading);
+      font-size: 1.3rem;
+      line-height: 1.25;
+    }
+
+    .about h3 {
+      margin: 1.1rem 0 .35rem;
+      color: var(--heading);
+      font-size: 1.02rem;
+    }
+
+    .about p { margin: 0 0 .7rem; }
+    .about p:last-child { margin-bottom: 0; }
+
     iframe {
       display: block;
       width: 100%;
@@ -251,7 +276,8 @@
       .header-inner { align-items: flex-start; }
       main { padding-top: 1.3rem; }
       .note,
-      .search-frame-shell { border-radius: 11px; }
+      .search-frame-shell,
+      .about { border-radius: 11px; }
     }
   </style>
 
@@ -323,6 +349,114 @@
         src="https://files.afu.se/Downloads/search/index.html"
         loading="eager"
       ></iframe>
+    </section>
+
+    <section class="about" aria-label="About this archive">
+      <h2>About the Isaac Koi archive</h2>
+      <p>
+        The Isaac Koi archive is a long-running personal research collection built up over
+        decades of interest in the UFO subject and related anomalous phenomena. It brings
+        together government documents, periodicals, newsletters, books, press clippings, and
+        reference material that would otherwise be scattered across libraries, private
+        holdings, and out-of-print publications. Isaac Koi has worked to digitise and share
+        substantial parts of this material so that researchers, journalists, and interested
+        readers can consult primary and secondary sources directly rather than relying on
+        second-hand summaries.
+      </p>
+      <p>
+        The files published online are hosted by Archives for the Unexplained (AFU), a
+        Swedish archive foundation in Norrk&ouml;ping dedicated to preserving collections on
+        UFOs, forteana, and allied subjects. AFU stores and serves the digitised documents
+        and the generated search data; this page is only the Isaac Koi-branded doorway into
+        that hosted material. The collection keeps growing as new scans and indexes are
+        prepared, so the searchable set is best understood as a snapshot of work in progress
+        rather than a finished catalogue of everything the physical archive holds.
+      </p>
+
+      <h3>What the search covers</h3>
+      <p>
+        The embedded interface searches a generated index over the archive's online file
+        set — the documents and PDFs published under <code>files.afu.se</code>. Typing a
+        name, date, place, case title, or keyword returns the indexed material that matches,
+        which makes it practical to trace a sighting report across several sources or to
+        check how a topic was described in newsletters from different decades. Because the
+        search reads a machine-built index, results reflect what has been digitised and
+        indexed so far; an empty result means the text is not in the online set, not
+        necessarily that the archive lacks the material.
+      </p>
+      <p>
+        The index favours recall over polish. Older scans are often the product of optical
+        character recognition on aged paper, so spelling variations, hyphenation, and the
+        occasional recognition error are expected inside document text. Trying a few
+        spellings of a surname or place, or searching on a distinctive phrase from a cited
+        source, usually surfaces material that a single exact query would miss.
+      </p>
+
+      <h3>What kind of material is included</h3>
+      <p>
+        The collection spans several kinds of source. Government and official material —
+        released files, correspondence, and policy documents — sits alongside the literature
+        of the subject itself: UFO periodicals and newsletters, books and booklets,
+        conference proceedings, and society publications, many of them long out of print.
+        Press coverage is represented through clippings and compiled news archives, and
+        reference material such as catalogues, bibliographies, and chronologies helps tie
+        the rest together. Because Isaac Koi has also contributed articles and reviews to
+        the field over the years, the archive doubles as a record of how ufology has
+        discussed its own history, including debates about methodology, hoaxes, and the
+        reliability of famous cases.
+      </p>
+      <p>
+        Coverage is international rather than limited to one country's experience. Material
+        touches on cases and publications from Britain, the United States, Scandinavia, and
+        elsewhere, and the hosting arrangement with AFU reflects that international
+        character: the physical preservation work sits with a specialist Swedish archive
+        while the online access layer is open to anyone with a browser.
+      </p>
+
+      <h3>Three ways to use this page</h3>
+      <p>
+        The quickest route is the embedded search above, which loads the working interface
+        from <code>files.afu.se</code> inside this page. If you prefer a full-window view —
+        for example when scanning long result lists or reading a document side by side with
+        notes — the "Open AFU-hosted search directly" button opens the same interface in its
+        own tab. Both routes reach identical data; the only difference is the surrounding
+        frame.
+      </p>
+      <p>
+        The "Run CORS diagnostic" link opens a small technical page that checks whether a
+        browser can read the AFU-hosted index files directly. Direct JavaScript reads across
+        origins require the file server to emit cross-origin headers; while those headers
+        are not being sent, this shell embeds the AFU-hosted package in a frame instead of
+        fetching the data itself. The diagnostic exists so the limitation can be re-tested
+        cheaply whenever the hosting configuration changes — if the headers are ever
+        enabled, the same page can switch to a fully integrated search without moving any
+        files.
+      </p>
+
+      <h3>Scope and interpretation</h3>
+      <p>
+        The archive is a research collection, not an endorsement engine. Documents reflect
+        the claims, conventions, and editorial standards of their original authors and
+        publishers, which range from official government releases to enthusiast newsletters
+        and sensational press coverage. Material is preserved and indexed because it is part
+        of the documented history of the subject, not because every statement in it has been
+        verified. Readers are encouraged to weigh sources against one another and to prefer
+        dated, attributed documents over unattributed retellings.
+      </p>
+      <p>
+        New material is added in batches as scanning and indexing complete, so a search that
+        comes up empty today may succeed after the next batch lands. Where the same document
+        exists in more than one format or edition, each version is indexed separately; small
+        differences between them — a revised introduction, an added appendix, a cleaner
+        scan — are part of the record rather than noise to be cleaned away.
+      </p>
+      <p>
+        Questions about the archive's contents belong with Isaac Koi; questions about the
+        hosting, bandwidth, or file organisation belong with AFU. This entry point is
+        maintained as a convenience so that the search has a stable, memorable address on
+        the isaackoi.com domain while the underlying files continue to live on the AFU
+        server.
+      </p>
     </section>
   </main>
 
